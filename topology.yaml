@@ -1,0 +1,19 @@
+nodes:
+  - name: attacker
+    image: kalilinux/kali-rolling
+    role: attacker
+    tools:
+      - nmap
+      - metasploit
+
+  - name: victim
+    image: ubuntu:20.04
+    role: victim
+    tools:
+      - snort
+
+  - name: firewall
+    image: ubuntu:20.04
+    role: firewall
+    tools:
+      - iptables

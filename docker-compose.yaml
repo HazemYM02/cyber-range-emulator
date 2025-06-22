@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  attacker:
+    build: ./attacker
+    container_name: attacker
+    tty: true
+    command: sleep infinity
+    networks:
+      cyber-range:
+        ipv4_address: 192.168.100.10
+
+  victim:
+    build: ./victim
+    container_name: victim
+    tty: true
+    command: sleep infinity
+    networks:
+      cyber-range:
+        ipv4_address: 192.168.100.20
+
+  firewall:
+    build: ./firewall
+    container_name: firewall
+    tty: true
+    command: sleep infinity
+    networks:
+      cyber-range:
+        ipv4_address: 192.168.100.30
+
+networks:
+  cyber-range:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
