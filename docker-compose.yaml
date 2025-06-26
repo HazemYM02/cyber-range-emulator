@@ -2,35 +2,119 @@ version: "3.9"
 
 services:
   attacker:
-    build: ./attacker
+    build:
+      context: ./attacker
+      dockerfile: Dockerfile
+    command: ["sleep", "infinity"]
     container_name: attacker
-    tty: true
-    command: sleep infinity
     networks:
-      cyber-range:
-        ipv4_address: 192.168.100.10
+      net_attacker:
+        ipv4_address: 172.28.0.10
+    privileged: true
+    tty: true
 
-  victim:
-    build: ./victim
-    container_name: victim
-    tty: true
-    command: sleep infinity
+  dns:
+    container_name: dns
+    image: andyshinn/dnsmasq
     networks:
-      cyber-range:
-        ipv4_address: 192.168.100.20
+      net_services:
+        ipv4_address: 172.30.0.50
+    platform: linux/amd64
+    tty: true
 
   firewall:
-    build: ./firewall
+    build:
+      context: ./firewall
+      dockerfile: Dockerfile
+    command: ["sleep", "infinity"]
     container_name: firewall
-    tty: true
-    command: sleep infinity
     networks:
-      cyber-range:
-        ipv4_address: 192.168.100.30
+      net_internal:
+        ipv4_address: 172.29.0.30
+    privileged: true
+    tty: true
+
+  router:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    command: ["sleep", "infinity"]
+    container_name: router
+    networks:
+      net_attacker:
+        ipv4_address: 172.28.0.254
+      net_internal:
+        ipv4_address: 172.29.0.254
+      net_services:
+        ipv4_address: 172.30.0.254
+    privileged: true
+    tty: true
+
+  siem:
+    build:
+      context: ./siem
+      dockerfile: Dockerfile
+    command: ["rsyslogd", "-n"]
+    container_name: siem
+    networks:
+      net_services:
+        ipv4_address: 172.30.0.70
+    tty: true
+
+  victim:
+    build:
+      context: ./victim
+      dockerfile: Dockerfile
+    command: ["sleep", "infinity"]
+    container_name: victim
+    networks:
+      net_internal:
+        ipv4_address: 172.29.0.10
+    tty: true
+
+  webserver:
+    container_name: webserver
+    image: vulnerables/web-dvwa
+    networks:
+      net_services:
+        ipv4_address: 172.30.0.40
+    platform: linux/amd64
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8080"
+        protocol: tcp
+    tty: true
+
+  workstation:
+    build:
+      context: ./workstation
+      dockerfile: Dockerfile
+    command: ["sleep", "infinity"]
+    container_name: workstation
+    networks:
+      net_internal:
+        ipv4_address: 172.29.0.60
+    tty: true
 
 networks:
-  cyber-range:
+  net_attacker:
+    name: cyber-range-emulator_net_attacker
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.100.0/24
+        - subnet: 172.28.0.0/24
+
+  net_internal:
+    name: cyber-range-emulator_net_internal
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/24
+
+  net_services:
+    name: cyber-range-emulator_net_services
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24

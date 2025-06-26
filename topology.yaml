@@ -17,3 +17,31 @@ nodes:
     role: firewall
     tools:
       - iptables
+
+  - name: webserver
+    image: vulnerables/web-dvwa
+    role: web
+    tools:
+      - apache2
+      - php
+      - mysql
+
+  - name: dns
+    image: andyshinn/dnsmasq
+    role: dns
+    tools:
+      - dnsmasq
+
+  - name: workstation
+    image: ubuntu:20.04
+    role: user
+    tools:
+      - curl
+      - netcat
+
+  - name: siem
+    image: ubuntu:20.04
+    role: log-monitor
+    tools:
+      - syslog
+      - rsyslog
