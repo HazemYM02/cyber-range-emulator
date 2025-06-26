@@ -54,4 +54,4 @@ docker compose build
 docker compose up -d
 
 # Launch GUI to visualize network
-streamlit run network_gui_enhanced.py
+streamlit run network_gui.py
