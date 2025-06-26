@@ -1,4 +1,4 @@
-# 🧠 Cyber-Range Emulator
+# Cyber-Range Emulator
 
 A modular, Docker-based cybersecurity training and testing environment that simulates a realistic, multi-zone network infrastructure. This project is designed to help students, educators, and security researchers learn and practice networking, penetration testing, and threat detection techniques in a safe, controlled environment.
 
