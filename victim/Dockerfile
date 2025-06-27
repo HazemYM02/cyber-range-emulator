@@ -1,13 +1,8 @@
 FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 RUN apt-get update && \
-    apt-get install -y snort iproute2 iputils-ping netcat-openbsd curl cron rsyslog && \
+    apt-get install -y vsftpd netcat iputils-ping && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Setup cron job to simulate web traffic to webserver
-RUN echo "* * * * * root curl -s http://172.30.0.40 > /dev/null" >> /etc/crontab
 
 CMD ["sleep", "infinity"]
