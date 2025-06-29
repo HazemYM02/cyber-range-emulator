@@ -2,15 +2,34 @@ version: "3.9"
 
 
 services:
+  db:
+    image: mariadb:10.5
+    container_name: dvwa-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: dvwa
+    networks:
+      net_internal:
+        ipv4_address: 172.29.0.100
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   attacker:
     build:
       context: ./attacker
       dockerfile: Dockerfile
+    platform: linux/amd64  
     container_name: attacker
     networks:
       net_attacker:
         ipv4_address: 172.28.0.10
     command: ["sleep", "infinity"]
+    privileged: true 
     tty: true
 
   attacker1:
@@ -43,7 +62,8 @@ services:
     networks:
       net_internal:
         ipv4_address: 172.29.0.10
-    command: ["sleep", "infinity"]
+    ports:
+      - "8081:80"
     tty: true
 
   victim1:
@@ -54,7 +74,8 @@ services:
     networks:
       net_internal:
         ipv4_address: 172.29.0.11
-    command: ["sleep", "infinity"]
+    ports:
+      - "8082:80"
     tty: true
 
   victim2:
@@ -65,8 +86,8 @@ services:
     networks:
       net_internal:
         ipv4_address: 172.29.0.12
-    command: ["sleep", "infinity"]
-    tty: true
+    ports:
+      - "8083:80"
 
   dns:
     container_name: dns
@@ -150,7 +171,6 @@ networks:
         - subnet: 172.28.0.0/24
 
   net_internal:
-    name: cyber-range-emulator_net_internal
     driver: bridge
     ipam:
       config:
