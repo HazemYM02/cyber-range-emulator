@@ -7,7 +7,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Enable IP forwarding on boot
+
 RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
+COPY startup.sh /startup.sh
+RUN chmod +x /startup.sh
+ENTRYPOINT ["/startup.sh"]
 CMD ["sleep", "infinity"]

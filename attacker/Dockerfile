@@ -16,4 +16,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+COPY startup.sh /startup.sh
+RUN chmod +x /startup.sh
+ENTRYPOINT ["/startup.sh"]
 CMD ["sleep", "infinity"]
