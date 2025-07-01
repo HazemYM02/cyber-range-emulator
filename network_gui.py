@@ -5,7 +5,7 @@ import tempfile
 import os
 
 st.set_page_config(page_title="Cyber-Range Network", layout="wide")
-st.title("📡 Cyber-Range Docker Network Visualisation")
+st.title("Cyber-Range Docker Network Visualisation")
 
 client = docker.from_env()
 graph = Network(height="800px", width="100%", directed=False)
@@ -30,9 +30,11 @@ roles = {
 # Add Docker networks
 networks = [net for net in client.networks.list() if "cyber-range-emulator" in net.name]
 for net in networks:
+    ipam_config = net.attrs.get("IPAM", {}).get("Config")
+    subnet = ipam_config[0].get("Subnet", "N/A") if ipam_config else "N/A"
     graph.add_node(
         net.name,
-        label=net.name,
+        label=f"{net.name}\n{subnet}",
         shape="box",
         color="#03a9f4",
         size=60,
@@ -46,14 +48,13 @@ for container in client.containers.list():
     net_info = container.attrs["NetworkSettings"]["Networks"]
     relevant_nets = {n: d for n, d in net_info.items() if "cyber-range-emulator" in n}
     ip_list = [d.get("IPAddress", "N/A") for d in relevant_nets.values()]
-    all_ips = "\\n".join(ip_list)
-    label = f"{cname}\\n{all_ips}"
+    all_ips = "\n".join(ip_list)
     tooltip = f"{image} ({', '.join(ip_list)})"
     role = roles.get(cname, {"shape": "ellipse", "color": "#90a4ae"})
 
     graph.add_node(
         cname,
-        label=label,
+        label=f"{cname}\n{all_ips}",
         title=tooltip,
         shape=role["shape"],
         color=role["color"],

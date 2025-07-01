@@ -1,11 +1,27 @@
-FROM ubuntu:20.04
+FROM debian:bullseye
+
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install useful tools for log monitoring and forwarding
 RUN apt-get update && \
-    apt-get install -y rsyslog tcpdump iputils-ping && \
+    apt-get install -y \
+    rsyslog \
+    iproute2 \
+    iputils-ping \
+    net-tools \
+    tcpdump \
+    curl \
+    vim \
+    procps && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Enable rsyslog in foreground mode
+COPY startup.sh /startup.sh
+RUN chmod +x /startup.sh
+
+
+ENTRYPOINT ["/startup.sh"]
+
+
 CMD ["rsyslogd", "-n"]

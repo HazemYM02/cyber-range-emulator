@@ -2,6 +2,22 @@ version: "3.9"
 
 
 services:
+  splunk:
+    image: splunk/splunk:9.2
+    platform: linux/amd64
+    container_name: splunk
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=changeme
+      - SPLUNK_HEC_ENABLE=true
+      - SPLUNK_HEC_TOKEN=12345678-abcd-1234-abcd-1234567890ab
+    ports:
+      - "8000:8000"
+      - "8088:8088"
+    networks:
+      net_services:
+        ipv4_address: 172.30.0.80
+    tty: true
   db:
     image: mariadb:10.5
     container_name: dvwa-db
@@ -125,12 +141,10 @@ services:
         ipv4_address: 172.30.0.254
     privileged: true
     tty: true
-
   siem:
     build:
       context: ./siem
       dockerfile: Dockerfile
-    command: ["rsyslogd", "-n"]
     container_name: siem
     networks:
       net_services:
