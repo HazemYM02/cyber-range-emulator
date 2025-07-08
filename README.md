@@ -12,7 +12,6 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 - 📡 Observe and test attacks across all machines freely
 - 🖼️ Visualize container roles and communication paths via a custom GUI
 - 🔍 Use `tcpdump`, `ping`, `curl`, `nmap` to test connectivity and visibility
-- 💻 No IP subnetting, routing, or manual route setup required
 
 ---
 
