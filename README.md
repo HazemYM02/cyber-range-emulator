@@ -1,6 +1,6 @@
 # Cyber-Range Emulator
 
-A modular, Docker-based cybersecurity training and testing environment designed to simulate real-world cyber operations in a **flat network**. This simplified topology runs all containers on a single shared Docker bridge network — ideal for quick prototyping, instruction, and testing without complex routing.
+A modular, Docker-based cybersecurity training and testing environment designed to simulate real-world cyber operations in a flat network. This simplified topology runs all containers on a single shared Docker bridge network — ideal for quick prototyping, instruction, and testing without complex routing.
 
 ---
 
