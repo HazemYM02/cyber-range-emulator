@@ -61,5 +61,6 @@ docker ps
 
 # 5. (Optional) Access a container to interact with tools
 docker exec -it attacker bash
+
 # 6. Launch the network visualizer in your browser
 streamlit run network_gui.py
