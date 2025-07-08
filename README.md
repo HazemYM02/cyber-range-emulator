@@ -41,9 +41,25 @@ All containers live on the **default Docker bridge network**. No separate subnet
 
 ---
 
-## 📸 Visualize the Network
+## Getting the Cyber-Range Emulator Up and Running
 
-Run this command to open the interactive network map:
+Follow these steps to launch the full emulator environment with all nodes:
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/HazemYM02/cyber-range-emulator.git
+cd cyber-range-emulator
+
+# 2. Build all Docker containers
+docker compose build
+
+# 3. Start the entire lab environment in the background
+docker compose up -d
+
+# 4. Confirm all containers are running
+docker ps
+
+# 5. (Optional) Access a container to interact with tools
+docker exec -it attacker bash
+# 6. Launch the network visualizer in your browser
 streamlit run network_gui.py
