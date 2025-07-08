@@ -1,72 +1,34 @@
 version: "3.9"
 
-
 services:
-  splunk:
-    image: splunk/splunk:9.2
-    platform: linux/amd64
-    container_name: splunk
-    environment:
-      - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=changeme
-      - SPLUNK_HEC_ENABLE=true
-      - SPLUNK_HEC_TOKEN=12345678-abcd-1234-abcd-1234567890ab
-    ports:
-      - "8000:8000"
-      - "8088:8088"
-    networks:
-      net_services:
-        ipv4_address: 172.30.0.80
+
+  router:
+    build:
+      context: ./router
+      dockerfile: Dockerfile
+    container_name: router
+    privileged: true
+    entrypoint: ["/startup.sh"]
+    command: ["sleep", "infinity"]
     tty: true
-  db:
-    image: mariadb:10.5
-    container_name: dvwa-db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: dvwa
-      MYSQL_USER: dvwa
-      MYSQL_PASSWORD: dvwa
-    networks:
-      net_internal:
-        ipv4_address: 172.29.0.100
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+  firewall:
+    build:
+      context: ./firewall
+      dockerfile: Dockerfile
+    container_name: firewall
+    privileged: true
+    entrypoint: ["/startup.sh"]
+    command: ["sleep", "infinity"]
+    tty: true
+
   attacker:
     build:
       context: ./attacker
       dockerfile: Dockerfile
-    platform: linux/amd64  
     container_name: attacker
-    networks:
-      net_attacker:
-        ipv4_address: 172.28.0.10
-    command: ["sleep", "infinity"]
-    privileged: true 
-    tty: true
-
-  attacker1:
-    build:
-      context: ./attacker
-      dockerfile: Dockerfile
-    container_name: attacker1
-    networks:
-      net_attacker:
-        ipv4_address: 172.28.0.11
-    command: ["sleep", "infinity"]
-    tty: true
-
-  attacker2:
-    build:
-      context: ./attacker
-      dockerfile: Dockerfile
-    container_name: attacker2
-    networks:
-      net_attacker:
-        ipv4_address: 172.28.0.12
+    privileged: true
+    entrypoint: ["/startup.sh"]
     command: ["sleep", "infinity"]
     tty: true
 
@@ -75,11 +37,10 @@ services:
       context: ./victim
       dockerfile: Dockerfile
     container_name: victim
-    networks:
-      net_internal:
-        ipv4_address: 172.29.0.10
     ports:
       - "8081:80"
+    entrypoint: ["/startup.sh"]
+    command: ["sleep", "infinity"]
     tty: true
 
   victim1:
@@ -87,11 +48,10 @@ services:
       context: ./victim
       dockerfile: Dockerfile
     container_name: victim1
-    networks:
-      net_internal:
-        ipv4_address: 172.29.0.11
     ports:
       - "8082:80"
+    entrypoint: ["/startup.sh"]
+    command: ["sleep", "infinity"]
     tty: true
 
   victim2:
@@ -99,100 +59,8 @@ services:
       context: ./victim
       dockerfile: Dockerfile
     container_name: victim2
-    networks:
-      net_internal:
-        ipv4_address: 172.29.0.12
     ports:
       - "8083:80"
-
-  dns:
-    container_name: dns
-    image: andyshinn/dnsmasq
-    networks:
-      net_services:
-        ipv4_address: 172.30.0.50
-    platform: linux/amd64
-    tty: true
-
-  firewall:
-    build:
-      context: ./firewall
-      dockerfile: Dockerfile
+    entrypoint: ["/startup.sh"]
     command: ["sleep", "infinity"]
-    container_name: firewall
-    networks:
-      net_internal:
-        ipv4_address: 172.29.0.30
-    privileged: true
     tty: true
-
-  router:
-    build:
-      context: ./router
-      dockerfile: Dockerfile
-    command: ["sleep", "infinity"]
-    container_name: router
-    networks:
-      net_attacker:
-        ipv4_address: 172.28.0.254
-      net_internal:
-        ipv4_address: 172.29.0.254
-      net_services:
-        ipv4_address: 172.30.0.254
-    privileged: true
-    tty: true
-  siem:
-    build:
-      context: ./siem
-      dockerfile: Dockerfile
-    container_name: siem
-    networks:
-      net_services:
-        ipv4_address: 172.30.0.70
-    tty: true
-
-  webserver:
-    container_name: webserver
-    image: vulnerables/web-dvwa
-    networks:
-      net_services:
-        ipv4_address: 172.30.0.40
-    platform: linux/amd64
-    ports:
-      - mode: ingress
-        target: 80
-        published: "8080"
-        protocol: tcp
-    tty: true
-
-  workstation:
-    build:
-      context: ./workstation
-      dockerfile: Dockerfile
-    command: ["sleep", "infinity"]
-    container_name: workstation
-    networks:
-      net_internal:
-        ipv4_address: 172.29.0.60
-    tty: true
-
-networks:
-  net_attacker:
-    name: cyber-range-emulator_net_attacker
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.28.0.0/24
-
-  net_internal:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.29.0.0/24
-
-  net_services:
-    name: cyber-range-emulator_net_services
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.30.0.0/24

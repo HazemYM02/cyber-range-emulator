@@ -1,4 +1,4 @@
 #!/bin/bash
-ip route add 172.29.0.0/24 via 172.28.0.254
-ip route add 172.30.0.0/24 via 172.28.0.254
+# Add routes if attacker needs to reach victims
+ip route add 192.168.102.0/24 via 192.168.100.1
 exec "$@"
