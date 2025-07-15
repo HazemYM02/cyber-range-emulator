@@ -1,21 +1,22 @@
 #!/bin/bash
 
 # Enable IP forwarding
-sysctl -w net.ipv4.ip_forward=1
+echo 1 > /proc/sys/net/ipv4/ip_forward
 
-# Flush any existing firewall rules
+# Clear rules
 iptables -F
+iptables -t nat -F
 
-# Default policy: DROP everything (you can make it ACCEPT for testing)
-iptables -P FORWARD DROP
+# Basic forwarding + NAT
+iptables -A FORWARD -i eth0 -o eth1 -j ACCEPT
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
-# Allow traffic from internal to router and back (stateful)
-iptables -A FORWARD -s 172.22.0.0/24 -d 172.20.0.0/16 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -s 172.20.0.0/16 -d 172.22.0.0/24 -m state --state ESTABLISHED,RELATED -j ACCEPT
+# Log all dropped packets
+iptables -A FORWARD -j LOG --log-prefix "FIREWALL DROP: " --log-level 4
 
-# Optional: Log accepted traffic (comment out if noisy)
-# iptables -A FORWARD -j LOG --log-prefix "FW-LOG: " --log-level 4
+# Start rsyslog for logging
+service rsyslog start
 
-echo "[firewall] IP forwarding enabled and firewall rules set."
-
-exec "$@"
+# Keep alive
+exec sleep infinity

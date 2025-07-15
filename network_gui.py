@@ -1,59 +1,67 @@
 import streamlit as st
 from pyvis.network import Network
 import streamlit.components.v1 as components
-import tempfile
 import os
 
-# Streamlit setup
-st.set_page_config(page_title="Cyber-Range Visualizer", layout="wide")
-st.title("🕷️ Cyber-Range Network Visualization")
+# Device names and IP addresses
+st.set_page_config(page_title="Network Topology", layout="wide")
+st.title("Network Topology Visualization")
 
-# Create a PyVis network (undirected edges)
-net = Network(height="750px", width="100%", directed=False)
-net.barnes_hut()
-
-# Node info with IP addresses
-nodes = {
-    "attacker": {"ip": "172.30.0.10", "color": "#e53935", "shape": "diamond"},
-    "router": {"ip": "172.30.0.1 / 172.31.0.1", "color": "#ffb300", "shape": "star"},
-    "firewall": {"ip": "172.31.0.2 / 172.32.0.1", "color": "#6d4c41", "shape": "hexagon"},
-    "victim": {"ip": "172.32.0.10", "color": "#000000", "shape": "box"},
-    "victim1": {"ip": "172.32.0.11", "color": "#000000", "shape": "box"},
-    "victim2": {"ip": "172.32.0.12", "color": "#000000", "shape": "box"},
+device_ips = {
+    'router': '172.30.200.3',
+    'firewall': '172.18.0.2',
+    'attacker': '172.18.0.3',
+    'victim': '172.18.0.4',
+    'victim1': '172.18.0.5',
+    'victim2': '172.18.0.6',
+    'home_firewall': '172.30.100.253',
+    'home_router': '172.30.100.254',
+    'smart_tv': '172.30.100.10',
+    'smart_light': '172.30.100.11',
+    'laptop': '172.30.100.20',
+    'splunk': '172.30.200.100'
 }
 
-# Add nodes with label and tooltip showing IP
-for name, props in nodes.items():
-    net.add_node(
-        name,
-        label=f"{name.upper()}\n{props['ip']}",
-        title=f"{name.upper()} - {props['ip']}",
-        shape=props["shape"],
-        color=props["color"],
-        font={"size": 20, "bold": True, "color": "#333"}
-    )
+# Create the graph
+net = Network(height="750px", width="100%", bgcolor="#ffffff", font_color="black", directed=False)
 
-# Define undirected edges
-edges = [
-    ("attacker", "router"),
-    ("router", "firewall"),
-    ("firewall", "victim"),
-    ("firewall", "victim1"),
-    ("firewall", "victim2"),
-]
+# Add nodes with shapes based on roles
+net.add_node('attacker', label=f"attacker\n{device_ips['attacker']}", color='red', shape='ellipse')
+net.add_node('router', label=f"router\n{device_ips['router']}", color='lightgray', shape='star')
+net.add_node('firewall', label=f"firewall\n{device_ips['firewall']}", color='gray', shape='box')
+net.add_node('home_firewall', label=f"home_firewall\n{device_ips['home_firewall']}", color='orange', shape='box')
+net.add_node('home_router', label=f"home_router\n{device_ips['home_router']}", color='orange', shape='star')
 
-for src, dst in edges:
-    net.add_edge(src, dst)
+# Victims = end-user targets (ellipse)
+for victim in ['victim', 'victim1', 'victim2']:
+    net.add_node(victim, label=f"{victim}\n{device_ips[victim]}", color='deepskyblue', shape='ellipse')
 
-# Save HTML to temp file
-with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-    tmp_path = tmp_file.name
-    net.write_html(tmp_path, notebook=False)
+# IoT/Home end-user nodes (ellipse)
+net.add_node('smart_tv', label=f"smart_tv\n{device_ips['smart_tv']}", color='lightblue', shape='ellipse')
+net.add_node('smart_light', label=f"smart_light\n{device_ips['smart_light']}", color='yellow', shape='ellipse')
+net.add_node('laptop', label=f"laptop\n{device_ips['laptop']}", color='lightgreen', shape='ellipse')
 
-# Embed into Streamlit
-with open(tmp_path, "r", encoding="utf-8") as f:
-    html = f.read()
-    components.html(html, height=750, scrolling=True)
+# Splunk log aggregator (hexagon)
+net.add_node('splunk', label=f"splunk\n{device_ips['splunk']}", color='orangered', shape='hexagon')
 
-# Cleanup temp file
-os.unlink(tmp_path)
+# Edges
+net.add_edges([
+    ('attacker', 'router'),
+    ('router', 'firewall'),
+    ('firewall', 'victim'),
+    ('firewall', 'victim1'),
+    ('firewall', 'victim2'),
+    ('router', 'home_firewall'),
+    ('home_firewall', 'home_router'),
+    ('home_router', 'smart_tv'),
+    ('home_router', 'smart_light'),
+    ('home_router', 'laptop'),
+    ('router', 'splunk')
+])
+
+# Render network
+output_path = os.path.join(os.getcwd(), "network_gui.html")
+net.save_graph(output_path)
+
+with open(output_path, "r", encoding="utf-8") as HtmlFile:
+    components.html(HtmlFile.read(), height=800, scrolling=True)

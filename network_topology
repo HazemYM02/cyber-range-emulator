@@ -1,0 +1,26 @@
+digraph CyberRange {
+	compound=true fontsize=10 rankdir=LR
+	router [fillcolor=lightgrey shape=box style=filled]
+	firewall [fillcolor=lightgrey shape=box style=filled]
+	attacker [fillcolor=lightgrey shape=box style=filled]
+	victim [fillcolor=lightgrey shape=box style=filled]
+	victim1 [fillcolor=lightgrey shape=box style=filled]
+	victim2 [fillcolor=lightgrey shape=box style=filled]
+	attacker -> victim
+	attacker -> victim1
+	attacker -> victim2
+	attacker -> firewall
+	router -> firewall
+	firewall -> victim
+	subgraph cluster_home {
+		color=lightblue label="Home Network" style=filled
+		smart_tv [fillcolor=lightyellow shape=ellipse style=filled]
+		smart_light [fillcolor=lightyellow shape=ellipse style=filled]
+		laptop [fillcolor=lightyellow shape=box style=filled]
+		home_router [fillcolor=lightyellow shape=box style=filled]
+	}
+	home_router -> smart_tv
+	home_router -> smart_light
+	home_router -> laptop
+	attacker -> home_router [label=scan]
+}
