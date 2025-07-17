@@ -39,7 +39,7 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 | `victim`     | DVWA instance              | Accessible at port 8081        |
 | `victim1`    | DVWA instance              | Accessible at port 8082        |
 | `victim2`    | DVWA instance              | Accessible at port 8083        |
-| `splunk`     | Log monitoring server      | Accessible at port 18000       |
+| `splunk`     | Log monitoring server      | Accessible at port 8000        |
 
 ### Home Network Extension
 
