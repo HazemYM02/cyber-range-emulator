@@ -58,7 +58,7 @@ This network is isolated via custom bridges and connected to the main router via
 ## Key Features and Additions
 
 - DVWA web applications deployed on multiple victim nodes for web pentesting  
-- Attacker node with tools: `nmap`, `sqlmap`, `hydra`, `john`, `wfuzz`, and more  
+- Attacker node with tools: `nmap`, `sqlmap`and `hydra` and more  
 - Firewall rules on `firewall` and `home_firewall` simulate real-world ACLs and packet drops  
 - Splunk container listens on port 514 for forwarded syslog messages and displays logs in a web UI  
 - Real-time packet inspection and log forwarding using `rsyslog` and `iptables`  
