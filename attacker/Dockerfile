@@ -28,6 +28,7 @@ RUN git clone https://github.com/sullo/nikto.git /opt/nikto && \
 
 # Copy user scripts
 COPY pentest_auto.py /opt/pentest_auto.py
+COPY nmap_nikto.py /opt/nmap_nikto.py
 COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh
 

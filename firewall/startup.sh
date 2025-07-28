@@ -15,8 +15,19 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 # Log all dropped packets
 iptables -A FORWARD -j LOG --log-prefix "FIREWALL DROP: " --log-level 4
 
+# Automation Prevention
+iptables -A INPUT -p tcp --dport 80 -m string --string "Nikto" --algo bm -j LOG --log-prefix "NIKTO_SCAN "
+iptables -A INPUT -p tcp --dport 80 -m string --string "nmap" --algo bm -j LOG --log-prefix "NMAP_SCAN "
+
 # Start rsyslog for logging
 service rsyslog start
+
+# Enable kernel logging for iptables
+modprobe ipt_LOG
+service rsyslog start
+
+# Start monitor
+python3 /opt/monitor.py &
 
 # Keep alive
 exec sleep infinity
