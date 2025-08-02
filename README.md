@@ -37,23 +37,9 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 | `router`     | Central switch/router node | Connects multiple subnets      |
 | `firewall`   | Core firewall              | Simulates packet filtering     |
 | `victim`     | DVWA instance              | Accessible at port 8081        |
-| `victim1`    | DVWA instance              | Accessible at port 8082        |
-| `victim2`    | DVWA instance              | Accessible at port 8083        |
-| `splunk`     | Log monitoring server      | Accessible at port 8000        |
+| `IoT`        | Shell Device               | Additional Node to attack      |
+| `splunk`     | Log monitoring server      | Accessible at port 8001        |
 
-### Home Network Extension
-
-| Container        | Role                  | IP Range          |
-|------------------|-----------------------|-------------------|
-| `home_router`     | Home Wi-Fi router      | 172.30.100.254     |
-| `home_firewall`   | Home network firewall  | Intercepts traffic |
-| `smart_tv`        | IoT device             | 172.30.100.10      |
-| `smart_light`     | IoT device             | 172.30.100.11      |
-| `laptop`          | User endpoint          | 172.30.100.20      |
-
-This network is isolated via custom bridges and connected to the main router via a dedicated firewall (`home_firewall`), with packet logging and inspection enabled.
-
----
 
 ## Key Features and Additions
 
