@@ -5,6 +5,8 @@ RUN apt-get update && apt-get install -y \
     git unzip mariadb-client iputils-ping net-tools vim \
     && docker-php-ext-install mysqli
 
+RUN apt-get update && apt-get install -y iproute2 iputils-ping
+
 # Enable Apache rewrite
 RUN a2enmod rewrite
 
@@ -21,10 +23,9 @@ COPY config/config.inc.php /var/www/html/config/config.inc.php
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
-# Add and prepare startup script
-COPY startup.sh /startup.sh
-RUN chmod +x /startup.sh
+
 
 EXPOSE 80
 
-CMD ["/startup.sh"]
+CMD ["sleep", "infinity"]
+

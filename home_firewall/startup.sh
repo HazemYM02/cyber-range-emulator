@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-# Enable IP forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
+ip route replace default via 172.24.0.1
 
 # Flush existing rules
 iptables -F

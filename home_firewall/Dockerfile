@@ -10,8 +10,4 @@ RUN apt-get update && apt-get install -y \
     nano \
     && apt-get clean
 
-COPY startup.sh /startup.sh
-RUN chmod +x /startup.sh
-
-ENTRYPOINT ["/startup.sh"]
 CMD ["sleep", "infinity"]

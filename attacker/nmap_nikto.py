@@ -3,9 +3,19 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 import threading
 import os
+import random 
 
 # Config
-TARGET_IPS = ["172.21.0.2", "172.21.0.3", "172.21.0.4"]  # Replace with your targets
+TARGET_IPS = [
+    "172.21.0.2",   # victim
+    "172.21.0.3",   # victim1
+    "172.21.0.4",   # victim2
+    "172.30.100.11",  # smart_light
+    "172.30.100.20",  # laptop
+    "172.20.100.10",
+    "172.18.0.2",     
+    "172.30.100.253"  # home_firewall
+]
 LOG_FILE = f"pentest_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"  # Fixed: Removed forward slashes
 NIKTO_OUTPUT_DIR = "nikto_results"
 
@@ -93,19 +103,17 @@ if __name__ == "__main__":
     with open(LOG_FILE, "w") as f:
         f.write(f"Automated Penetration Test - {datetime.now()}\n")
 
-    log("[*] Starting AUTOMATED PENETRATION TEST (Nmap + Nikto)...")
-    log(f"[*] Targets: {', '.join(TARGET_IPS)}")
+    log("[*] Starting RANDOMIZED PENETRATION TEST (Nmap + Nikto)...")
+    log(f"[*] Available Targets: {', '.join(TARGET_IPS)}")
     log("[*] Note: Authorized test. Using Nmap for scanning and Nikto for web exploitation.")
 
-    # Run attacks in parallel threads
-    threads = []
-    for ip in TARGET_IPS:
-        thread = threading.Thread(target=attack_target, args=(ip,))
-        threads.append(thread)
-        thread.start()
+    # === 👇 Random selection instead of scanning all targets
+    selected_target = random.choice(TARGET_IPS)
+    log(f"[*] Selected random target: {selected_target}")
 
-    # Wait for all threads to complete
-    for thread in threads:
-        thread.join()
+    # Attack only the selected random target
+    attack_thread = threading.Thread(target=attack_target, args=(selected_target,))
+    attack_thread.start()
+    attack_thread.join()
 
-    log("[+] Automated penetration test completed. Review logs and results.")
+    log("[+] Randomized penetration test completed. Review logs and results.")

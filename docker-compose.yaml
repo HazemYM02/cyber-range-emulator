@@ -5,170 +5,112 @@ services:
   router:
     build:
       context: ./router
-      dockerfile: Dockerfile
     container_name: router
     privileged: true
-    entrypoint: ["/startup.sh"]
-    command: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+    command: ["sh", "-c", "echo 1 > /proc/sys/net/ipv4/ip_forward && ip route add 10.88.30.0/24 via 10.88.40.10 && sleep infinity"]
     networks:
       attacker_net:
-        ipv4_address: 172.20.0.254
-      victim_net:
-        ipv4_address: 172.21.0.254
-      dmz_home:
-        ipv4_address: 172.30.200.3
-    tty: true
+        ipv4_address: 10.88.10.254
+      home_net:
+        ipv4_address: 10.88.20.254
+      router_firewall_net:
+        ipv4_address: 10.88.40.254
 
-  firewall:
+  victim:
     build:
-      context: ./firewall
-      dockerfile: Dockerfile
-    container_name: firewall
-    platform: linux/amd64
+      context: ./victim
+    container_name: victim
     privileged: true
+    cap_add:
+      - NET_ADMIN
     ports:
-      - "18000:8000" 
-      - "8088:8088"
-      - "514:514/udp"
-    entrypoint: ["/startup.sh"]
-    command: ["sleep", "infinity"]
-    tty: true
+      - "8000:80"
+    command: ["sh", "-c", "ip route replace default via 10.88.30.254 && apache2-foreground"]
+    networks:
+      victim_net:
+        ipv4_address: 10.88.30.10
+
+  iot:
+    build:
+      context: ./iot
+    container_name: iot1
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    command: ["sh", "-c", "ip route replace default via 10.88.20.254 && sleep infinity"]
+    networks:
+      home_net:
+        ipv4_address: 10.88.20.10
 
   attacker:
     build:
       context: ./attacker
-      dockerfile: Dockerfile
     container_name: attacker
     privileged: true
-    entrypoint: ["/startup.sh"]
-    command: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+    command: ["sh", "-c", "ip route add 10.88.30.0/24 via 10.88.10.254 && sleep infinity"]
     networks:
       attacker_net:
-        ipv4_address: 172.20.0.2
-    tty: true
-
+        ipv4_address: 10.88.10.10
   splunk:
     image: splunk/splunk:latest
     platform: linux/amd64
     container_name: splunk
     environment:
-      - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=changeme
+     - SPLUNK_START_ARGS=--accept-license
+     - SPLUNK_PASSWORD=changeme123
     ports:
-      - "8000:8000"
-      - "8089:8089"
+      - "8001:8000"
+      - "8088:8088"
       - "9997:9997"
     networks:
-      default:
-      dmz_home:
-        ipv4_address: 172.30.200.100
-
-  victim:
-    build:
-      context: ./victim
-      dockerfile: Dockerfile
-    container_name: victim
-    ports:
-    - "8081:80"
-    entrypoint: ["/startup.sh"]
-    networks:
+      attacker_net:
+        ipv4_address: 10.88.10.200
+      home_net:
+        ipv4_address: 10.88.20.200
       victim_net:
-        ipv4_address: 172.21.0.2
-    tty: true
+        ipv4_address: 10.88.30.200
     privileged: true
+    restart: unless-stopped
 
-  victim1:
+  firewall:
     build:
-      context: ./victim
-      dockerfile: Dockerfile
-    container_name: victim1
-    ports:
-      - "8082:80"
-    entrypoint: ["/startup.sh"]
-    command: ["sleep", "infinity"]
+      context: ./firewall
+    container_name: firewall
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    command: ["sh", "-c", "echo 1 > /proc/sys/net/ipv4/ip_forward && ip route replace default via 10.88.40.254 && sleep infinity"]
     networks:
+      router_firewall_net:
+        ipv4_address: 10.88.40.10
       victim_net:
-        ipv4_address: 172.21.0.3
-    tty: true
-
-  victim2:
-    build:
-      context: ./victim
-      dockerfile: Dockerfile
-    container_name: victim2
-    ports:
-      - "8083:80"
-    entrypoint: ["/startup.sh"]
-    command: ["sleep", "infinity"]
-    networks:
-      victim_net:
-        ipv4_address: 172.21.0.4
-    tty: true
-
-  home_firewall:
-    build:
-      context: ./home_firewall
-    container_name: home_firewall
-    privileged: true
-    tty: true
-    networks:
-      dmz_home:
-        ipv4_address: 172.30.200.2
-      home_network:
-        ipv4_address: 172.30.100.253
-  home_router:
-    image: alpine
-    container_name: home_router
-    command: ["sleep", "infinity"]
-    privileged: true
-    networks:
-      home_network:
-        ipv4_address: 172.30.100.254 
-
-  smart_tv:
-    image: nginx:alpine
-    container_name: smart_tv
-    networks:
-      home_network:
-        ipv4_address: 172.30.100.10
-
-  smart_light:
-    image: alpine
-    container_name: smart_light
-    command: ["sleep", "infinity"]
-    networks:
-      home_network:
-        ipv4_address: 172.30.100.11
-
-  laptop:
-    image: kalilinux/kali-rolling
-    container_name: laptop
-    tty: true
-    networks:
-      home_network:
-        ipv4_address: 172.30.100.20
+        ipv4_address: 10.88.30.254
 
 networks:
   attacker_net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/24
+        - subnet: 10.88.10.0/24
+
+  home_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.88.20.0/24
 
   victim_net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.21.0.0/24
-  home_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.30.100.0/24
-          gateway: 172.30.100.1
+        - subnet: 10.88.30.0/24
 
-  dmz_home:
+  router_firewall_net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.30.200.0/24
+        - subnet: 10.88.40.0/24
