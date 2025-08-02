@@ -3,59 +3,75 @@ from pyvis.network import Network
 import streamlit.components.v1 as components
 import os
 
-# IP mapping for display
-device_ips = {
-    'attacker': '172.20.0.2',
-    'router': '172.20.0.254',
-    'firewall': '172.18.0.2',
-    'victim': '172.21.0.2',
-    'victim1': '172.21.0.3',
-    'victim2': '172.21.0.4',
-    'home_router': '172.30.100.254',
-    'home_firewall': '172.30.100.253',
-    'smart_tv': '172.30.100.10',
-    'smart_light': '172.30.100.11',
-    'laptop': '172.30.100.20',
-    'splunk': '172.30.200.100'
+# Extended device info
+devices = {
+    'attacker': {
+        'name': 'Attacker',
+        'ip': '10.88.10.10',
+        'routes': '→ Router (10.88.10.254)',
+        'color': 'red',
+        'shape': 'ellipse'
+    },
+    'router': {
+        'name': 'Router',
+        'ip': '10.88.10.254 / 10.88.20.254 / 10.88.40.254',
+        'routes': '← Attacker, IoT | → Firewall, Splunk',
+        'color': 'gray',
+        'shape': 'star'
+    },
+    'iot': {
+        'name': 'IoT 1',
+        'ip': '10.88.20.10',
+        'routes': '→ Router (10.88.20.254)',
+        'color': 'orange',
+        'shape': 'dot'
+    },
+    'firewall': {
+        'name': 'Firewall',
+        'ip': '10.88.40.10 / 10.88.30.254',
+        'routes': '← Router | → Victim, Splunk',
+        'color': 'gray',
+        'shape': 'box'
+    },
+    'victim': {
+        'name': 'Victim',
+        'ip': '10.88.30.10',
+        'routes': '→ Firewall (10.88.30.254)',
+        'color': 'deepskyblue',
+        'shape': 'ellipse'
+    },
+    'splunk': {
+        'name': 'Splunk',
+        'ip': '10.88.10.200 / 10.88.20.200 / 10.88.30.200',
+        'routes': 'Connected to all segments',
+        'color': 'orangered',
+        'shape': 'hexagon'
+    }
 }
 
-# Initialize network
+# Initialize the network graph
 net = Network(height="750px", width="100%", bgcolor="#ffffff", font_color="black", directed=False)
 
-# Core infrastructure nodes
-net.add_node("attacker", label=f"attacker\n{device_ips['attacker']}", color="red", shape="ellipse")
-net.add_node("router", label=f"router\n{device_ips['router']}", color="gray", shape="star")
-net.add_node("firewall", label=f"firewall\n{device_ips['firewall']}", color="gray", shape="box")
-net.add_node("splunk", label=f"splunk\n{device_ips['splunk']}", color="orangered", shape="hexagon")
+# Add nodes with tooltip details
+for key, info in devices.items():
+    title = f"{info['name']}\nIP: {info['ip']}\nRoutes: {info['routes']}"
+    net.add_node(key, label=info['name'], title=title, color=info['color'], shape=info['shape'])
 
-# Victim nodes (web app targets)
-for victim in ["victim", "victim1", "victim2"]:
-    net.add_node(victim, label=f"{victim}\n{device_ips[victim]}", color="deepskyblue", shape="ellipse")
-
-# Home network components
-net.add_node("home_router", label=f"home_router\n{device_ips['home_router']}", color="orange", shape="star")
-net.add_node("home_firewall", label=f"home_firewall\n{device_ips['home_firewall']}", color="orange", shape="box")
-net.add_node("smart_tv", label=f"smart_tv\n{device_ips['smart_tv']}", color="lightblue", shape="ellipse")
-net.add_node("smart_light", label=f"smart_light\n{device_ips['smart_light']}", color="yellow", shape="ellipse")
-net.add_node("laptop", label=f"laptop\n{device_ips['laptop']}", color="lightgreen", shape="ellipse")
-
-# Edges
-net.add_edges([
+# Define connections
+edges = [
     ("attacker", "router"),
+    ("iot", "router"),
     ("router", "firewall"),
     ("firewall", "victim"),
-    ("firewall", "victim1"),
-    ("firewall", "victim2"),
     ("router", "splunk"),
-    ("router", "home_firewall"),
-    ("home_firewall", "home_router"),
-    ("home_router", "smart_tv"),
-    ("home_router", "smart_light"),
-    ("home_router", "laptop")
-])
+    ("firewall", "splunk"),
+    ("victim", "splunk"),
+    ("iot", "splunk")
+]
+net.add_edges(edges)
 
-# Render to HTML and embed in Streamlit
-output_path = os.path.join(os.getcwd(), "network_gui.html")
+# Render and display
+output_path = os.path.join(os.getcwd(), "network_gui_interactive.html")
 net.save_graph(output_path)
 
 with open(output_path, "r", encoding="utf-8") as HtmlFile:
