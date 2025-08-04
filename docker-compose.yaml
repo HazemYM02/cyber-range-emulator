@@ -1,15 +1,20 @@
 version: "3.9"
 
 services:
-
   router:
     build:
       context: ./router
+    platform: linux/amd64
     container_name: router
     privileged: true
     cap_add:
       - NET_ADMIN
-    command: ["sh", "-c", "echo 1 > /proc/sys/net/ipv4/ip_forward && ip route add 10.88.30.0/24 via 10.88.40.10 && sleep infinity"]
+    command: >
+      sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward && \
+              ip route replace 10.88.10.0/24 dev eth0 && \
+              ip route replace 10.88.20.0/24 dev eth1 && \
+              ip route replace 10.88.30.0/24 via 10.88.40.10 && \
+              sleep infinity"
     networks:
       attacker_net:
         ipv4_address: 10.88.10.254
@@ -17,7 +22,6 @@ services:
         ipv4_address: 10.88.20.254
       router_firewall_net:
         ipv4_address: 10.88.40.254
-
   victim:
     build:
       context: ./victim
@@ -51,7 +55,12 @@ services:
     privileged: true
     cap_add:
       - NET_ADMIN
-    command: ["sh", "-c", "ip route add 10.88.30.0/24 via 10.88.10.254 && sleep infinity"]
+    command: >
+        sh -c "
+        ip route add 10.88.20.0/24 via 10.88.10.254 &&
+        ip route add 10.88.30.0/24 via 10.88.10.254 &&
+        sleep infinity
+        "
     networks:
       attacker_net:
         ipv4_address: 10.88.10.10
