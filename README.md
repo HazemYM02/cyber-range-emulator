@@ -1,6 +1,6 @@
 # Cyber-Range Emulator
 
-A modular, Docker-based cybersecurity training and testing environment designed to simulate real-world cyber operations in both flat and segmented networks. Originally built around a flat Docker bridge network, the environment has evolved to support isolated subnets, firewalls, IoT nodes, and centralized log collection.
+A modular, Docker-based cybersecurity training and testing environment designed to simulate real-world cyber operations in both flat and segmented networks. Originally built around a flat Docker bridge network, the environment has evolved to support **multiple isolated subnets, dedicated firewalls, IoT devices, and centralized log collection**.
 
 ---
 
@@ -8,10 +8,10 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 
 - Quick-start, modular lab setup for penetration testing and network defense training  
 - Simulate common attack paths and misconfigurations in controlled networks  
-- Launch security tools like Nmap, Snort, DVWA, and more  
+- Launch security tools like Nmap, Nikto, Wapiti, ZAP, and more  
 - Monitor attacks and logs using centralized Splunk integration  
 - Visualize container roles and connectivity through a custom interactive GUI  
-- Practice red teaming, packet analysis, and basic log correlation
+- Practice red teaming, packet analysis, ARP spoofing, and basic log correlation
 
 ---
 
@@ -21,7 +21,7 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 - **Python** — for orchestration and visualization  
 - **Streamlit + PyVis** — network visualization GUI  
 - **DVWA** — Damn Vulnerable Web App targets  
-- **Snort, tcpdump, netcat, Nmap** — penetration and detection tools  
+- **ZAP CLI, Wapiti, Nikto, Nmap** — penetration and scanning tools  
 - **Splunk** — centralized log collection and analysis  
 - **Bash, iptables, iproute2** — firewall rule testing and network manipulation
 
@@ -31,24 +31,30 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 
 ### Core Nodes
 
-| Container    | Role                       | Notes                          |
-|--------------|----------------------------|--------------------------------|
-| `attacker`   | Pentesting tools           | Can reach all targets          |
-| `router`     | Central switch/router node | Connects multiple subnets      |
-| `firewall`   | Core firewall              | Simulates packet filtering     |
-| `victim`     | DVWA instance              | Accessible at port 8081        |
-| `IoT`        | Shell Device               | Additional Node to attack      |
-| `splunk`     | Log monitoring server      | Accessible at port 8001        |
+| Container           | Role                       | Notes / Access Ports         |
+|---------------------|----------------------------|------------------------------|
+| `attacker`          | Pentesting tools           | Nmap, Nikto, Wapiti, ZAP CLI |
+| `router`            | Central router/switch      | Connects all subnets         |
+| `firewall`          | Core firewall              | Cockpit web UI: **9090**     |
+| `victim`            | DVWA target                | **http://localhost:8000**    |
+| `iot1`              | IoT device                 | Test for IoT exploits        |
+| `iot-bulb`          | IoT smart bulb             | Simulated vulnerable device  |
+| `iot-camera`        | IoT camera                 | Accessible at **8081**       |
+| `iot-thermostat-web`| IoT thermostat web panel   | Accessible at **8082**       |
+| `splunk`            | Log monitoring server      | **http://localhost:8001**    |
 
+---
 
 ## Key Features and Additions
 
-- DVWA web applications deployed on multiple victim nodes for web pentesting  
-- Attacker node with tools: `nmap`, `sqlmap`and `hydra` and more  
-- Firewall rules on `firewall` and `home_firewall` simulate real-world ACLs and packet drops  
-- Splunk container listens on port 514 for forwarded syslog messages and displays logs in a web UI  
-- Real-time packet inspection and log forwarding using `rsyslog` and `iptables`  
-- Visual GUI with shape-based node roles:  
+- **Multiple IoT nodes** to simulate diverse attack surfaces  
+- **Attacker node** preloaded with scanning and exploitation tools: `nmap`, `nikto`, `wapiti`, `zap-cli`, and `dsniff` (for ARP spoofing)  
+- **Firewall with Cockpit UI** for real-time management (`http://localhost:9090`)  
+- **Centralized logging via Splunk** on `http://localhost:8001`  
+- **DVWA** running on victim node at `http://localhost:8000`  
+- **Network segmentation** enforced by Docker bridge networks and firewall rules  
+- **Real-time packet inspection** and log forwarding via `rsyslog` and `iptables`  
+- **Graphical network visualization** with Streamlit + PyVis:
   - Router: star  
   - Firewalls: box  
   - Endpoints/IoT: ellipse  
@@ -72,11 +78,15 @@ docker compose up -d
 # 4. Confirm all containers are running
 docker ps
 
-# 5. Access a container to interact with tools
+# 5. Access the attacker container to run security tools
 docker exec -it attacker bash
 
 # 6. Launch the network visualizer (Streamlit GUI)
 streamlit run network_gui.py
 
-# 7. Access Splunk (for logs)
-http://localhost:8000
+# 7. Access the main services in your browser
+DVWA Victim:  http://localhost:8000  
+IoT Camera:   http://localhost:8081  
+IoT Thermostat: http://localhost:8082  
+Firewall Cockpit: http://localhost:9090  
+Splunk UI:    http://localhost:8001
