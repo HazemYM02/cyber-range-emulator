@@ -1,0 +1,9 @@
+FROM debian:bullseye
+WORKDIR /opt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 python3-pip ca-certificates iproute2 && \
+    pip3 install paho-mqtt && \
+    rm -rf /var/lib/apt/lists/*
+COPY publish_temp.py /opt/publish_temp.py
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh

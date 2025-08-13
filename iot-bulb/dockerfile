@@ -1,0 +1,8 @@
+FROM debian:bullseye
+WORKDIR /opt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libcoap2-bin iproute2 && \
+    rm -rf /var/lib/apt/lists/*
+COPY run_coap.sh /opt/run_coap.sh
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh /opt/run_coap.sh

@@ -9,12 +9,7 @@ services:
     privileged: true
     cap_add:
       - NET_ADMIN
-    command: >
-      sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward && \
-             ip route replace 10.88.10.0/24 dev eth0 && \
-             ip route replace 10.88.20.0/24 dev eth1 && \
-             ip route replace 10.88.30.0/24 via 10.88.40.10 && \
-             sleep infinity"
+    command: ./startup.sh
     networks:
       attacker_net:
         ipv4_address: 10.88.10.254
@@ -23,7 +18,7 @@ services:
       router_firewall_net:
         ipv4_address: 10.88.40.254
       victim_net:
-        ipv4_address: 10.88.30.25
+        ipv4_address: 10.88.30.254
 
   firewall:
     build:
@@ -32,10 +27,7 @@ services:
     privileged: true
     cap_add:
       - NET_ADMIN
-    command: >
-      sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward && \
-             ip route replace default via 10.88.40.254 && \
-             sleep infinity"
+    command: /opt/startup.sh
     ports:
       - "9090:9090"
     networks:
@@ -53,22 +45,62 @@ services:
       - NET_ADMIN
     ports:
       - "8000:80"
-    command: ["sh", "-c", "ip route replace default via 10.88.30.253 && apache2-foreground"]
+    command: /opt/startup.sh
     networks:
       victim_net:
         ipv4_address: 10.88.30.10
 
-  iot:
+  iot1:
     build:
       context: ./iot
     container_name: iot1
     privileged: true
     cap_add:
       - NET_ADMIN
-    command: ["sh", "-c", "ip route replace default via 10.88.20.254 && sleep infinity"]
+    command: /opt/startup.sh
     networks:
       home_net:
         ipv4_address: 10.88.20.10
+
+  iot-bulb:
+    build:
+      context: ./iot-bulb
+    container_name: iot-bulb
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    command: /opt/startup.sh
+    networks:
+      home_net:
+        ipv4_address: 10.88.20.12
+
+  iot-camera:
+    build:
+      context: ./iot-camera
+    container_name: iot-camera
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    command: /opt/startup.sh
+    ports:
+      - "8081:8081"   
+    networks:
+      home_net:
+        ipv4_address: 10.88.20.13
+
+  iot-thermostat-web:
+    build:
+      context: ./iot-thermostat-web
+    container_name: iot-thermostat-web
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    command: /opt/startup.sh
+    ports:
+      - "8082:8082"
+    networks:
+      home_net:
+        ipv4_address: 10.88.20.14
 
   attacker:
     build:
@@ -77,13 +109,7 @@ services:
     privileged: true
     cap_add:
       - NET_ADMIN
-    command: >
-      sh -c "
-      ip route replace default via 10.88.10.254 &&
-      ip route add 10.88.20.0/24 via 10.88.10.254 &&
-      ip route add 10.88.30.0/24 via 10.88.10.254 &&
-      sleep infinity
-      "
+    command: /opt/startup.sh
     networks:
       attacker_net:
         ipv4_address: 10.88.10.10
@@ -93,8 +119,9 @@ services:
     platform: linux/amd64
     container_name: splunk
     environment:
-     - SPLUNK_START_ARGS=--accept-license
-     - SPLUNK_PASSWORD=changeme123
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_GENERAL_TERMS=--accept-sgt-current-at-splunk-com
+      - SPLUNK_PASSWORD=changeme123
     ports:
       - "8001:8000"
       - "8088:8088"

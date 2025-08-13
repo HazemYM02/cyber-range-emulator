@@ -14,6 +14,10 @@ RUN apt-get update && \
     tcpdump \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh
+
 # Set working directory
 WORKDIR /opt
 

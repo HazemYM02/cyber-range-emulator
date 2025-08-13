@@ -1,6 +1,4 @@
 #!/bin/sh
+ip route replace default via 10.88.20.254
 
-ip route replace default via 172.25.0.1
-
-# Keep alive
-exec sleep infinity
+sleep infinity

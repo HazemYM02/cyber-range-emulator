@@ -1,0 +1,10 @@
+FROM debian:bullseye
+WORKDIR /opt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 python3-pip iproute2 && \
+    pip3 install flask && \
+    rm -rf /var/lib/apt/lists/*
+COPY app.py /opt/app.py
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh
+EXPOSE 8082

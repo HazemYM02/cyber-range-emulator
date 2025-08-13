@@ -22,5 +22,8 @@ RUN wget -O splunkforwarder.tgz "https://download.splunk.com/products/universalf
 # Add Splunk to PATH
 ENV PATH="/opt/splunkforwarder/bin:${PATH}"
 
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh
+
 WORKDIR /opt
 CMD ["sleep", "infinity"]

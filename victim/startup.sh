@@ -1,9 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-# Set default route to firewall
-ip route replace default via 172.21.0.1
+# Set default route via firewall
+ip route replace default via 10.88.30.253
+
+# Start Apache properly
 apache2ctl -D FOREGROUND
-
-# Keep container alive
-exec tail -f /dev/null
-exec "$@"
