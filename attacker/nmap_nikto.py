@@ -8,7 +8,13 @@ import re
 import logging
 
 # === Configuration ===
-TARGET_IPS = ["10.88.30.10", "10.88.20.10"]
+TARGET_IPS = [
+    "10.88.30.10",  # Victim node
+    "10.88.20.10",  # IoT device 1
+    "10.88.20.12",  # IoT device 2
+    "10.88.20.13",  # IoT device 3
+    "10.88.20.14",  # IoT device 4
+]
 
 # Use absolute paths inside container
 LOG_DIR = "/app/logs"

@@ -1,0 +1,13 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    iproute2 iputils-ping net-tools curl wget ca-certificates \
+    tcpdump tshark nmap nikto wapiti dsniff \
+    git unzip jq ffmpeg \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh
+CMD ["/opt/startup.sh"]

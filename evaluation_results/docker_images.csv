@@ -1,0 +1,13 @@
+repository,tag,image_id,size
+cyber-range-emulator-attacker,latest,f16af4cf229b,777MB
+cyber-range-emulator-firewall,latest,2996697cb5b1,267MB
+cyber-range-emulator-router,latest,cf53892d0322,631MB
+cyber-range-emulator-iot-camera,latest,b382b1a9b463,345MB
+cyber-range-emulator-iot-thermostat-web,latest,b2aa4eb4ca55,271MB
+cyber-range-emulator-victim,latest,3e4d529735f6,468MB
+cyber-range-emulator-iot1,latest,be18c183d8fd,278MB
+cyber-range-emulator-iot-bulb,latest,c0aabf00533b,199MB
+cyber-range-emulator-attacker-home,latest,be9054e5b37d,924MB
+cyber-range-emulator-attacker-victim,latest,860e915a14ad,503MB
+cyber-range-emulator-iot2,latest,946e369d89cc,278MB
+splunk/splunk,latest,10da23a5c783,6.51GB

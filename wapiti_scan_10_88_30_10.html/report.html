@@ -12,22 +12,9 @@
         <header style="text-align: center">
         <h2 class="title" style="text-align: center">Wapiti vulnerability report</h2>
         <h3>Target: ${target}</h3>
-        <p>Date of the scan: ${scan_date}. Scope of the scan: ${scan_scope}. Crawled pages: ${crawled_pages_nbr}</p>
+        <p>Date of the scan: ${scan_date}. Scope of the scan: ${scan_scope}</p>
         </header>
         <hr />
-        % if auth_dict != None:
-        <h4>Authentication</h4>
-        <p>
-            Url: ${auth_dict["url"]}<br>
-            Logged in: ${auth_dict["logged_in"]}<br>
-            % if auth_form_dict != None and len(auth_form_dict) > 0:
-            Login field: ${auth_form_dict["login_field"]}<br>
-            Password field: ${auth_form_dict["password_field"]}<br>
-            % endif
-        </p>
-        <hr />
-        % endif
-
         <h4>Summary</h4>
         <table class="width-100 hovered" style="background: url('logo_clear.png') no-repeat center;">
             <thead>
@@ -86,46 +73,20 @@
                 </dl>
 
                     % for j, vulnerability in enumerate(vulnerabilities[vuln_name]):
-                        <h4>${level_to_emoji(vulnerability["level"])} Vulnerability found in ${vulnerability["path"] | h}</h4>
+                        <h4>Vulnerability found in ${vulnerability["path"] | h}</h4>
                         <nav class="tabs" data-kube="tabs" data-equal="true" data-height="equal">
                             <a href="#tab-vuln-${i}-${j}-1" class="is-active">Description</a>
                             <a href="#tab-vuln-${i}-${j}-2">HTTP Request</a>
-                            % if detailed_report is True and vulnerability["detail"]["response"] is not None:
-                                <a href="#tab-vuln-${i}-${j}-3">HTTP Response</a>
-                            % endif
-                            <a href="#tab-vuln-${i}-${j}-4">cURL command line</a>
-                            <a href="#tab-vuln-${i}-${j}-5">WSTG Code</a>
+                            <a href="#tab-vuln-${i}-${j}-3">cURL command line</a>
                         </nav>
                         <section id="tab-vuln-${i}-${j}-1" style="min-height: 124px;">
                             <pre>${vulnerability["info"] | h}</pre>
                         </section>
                         <section id="tab-vuln-${i}-${j}-2" style="min-height: 124px;" class="is-hidden">
-                            <pre style="white-space: normal;">
-                                % for line in vulnerability["http_request"].split("\n"):
-                                    ${line | h}
-                                    <br>
-                                % endfor
-                            </pre>
+                            <pre>${vulnerability["http_request"] | h}</pre>
                         </section>
-                        % if detailed_report is True and vulnerability["detail"]["response"] is not None:
-                            <section id="tab-vuln-${i}-${j}-3" style="min-height: 124px;" class="is-hidden">
-                                <pre style="white-space: nowrap">
-                                    HTTP ${vulnerability["detail"]["response"]["status_code"] | h}<br />
-                                    % if vulnerability["detail"]["response"]["headers"] is not None:
-                                        % for header in vulnerability["detail"]["response"]["headers"]:
-                                            ${header[0] | h}: ${header[1] | h}<br />
-                                        %endfor
-                                    %endif
-                                    <br />
-                                    ${vulnerability["detail"]["response"]["body"] | h}
-                                </pre>
-                            </section>
-                        % endif
-                        <section id="tab-vuln-${i}-${j}-4" style="min-height: 124px;" class="is-hidden">
+                        <section id="tab-vuln-${i}-${j}-3" style="min-height: 124px;" class="is-hidden">
                             <pre>${vulnerability["curl_command"] | h}</pre>
-                        </section>
-                        <section id="tab-vuln-${i}-${j}-5" style="min-height: 124px;" class="is-hidden">
-                            <pre>${vulnerability["wstg"] | h}</pre>
                         </section>
                     % endfor
 
@@ -149,46 +110,20 @@
                 </dl>
 
                     % for j, anomaly in enumerate(anomalies[anomaly_name]):
-                        <h4>🤕 Anomaly found in ${anomaly["path"] | h}</h4>
+                        <h4>Anomaly found in ${anomaly["path"] | h}</h4>
                         <nav class="tabs" data-kube="tabs" data-equal="true" data-height="equal">
                             <a href="#tab-anom-${i}-${j}-1" class="is-active">Description</a>
                             <a href="#tab-anom-${i}-${j}-2">HTTP Request</a>
-                            % if detailed_report is True and anomaly["detail"]["response"] is not None:
-                                <a href="#tab-anom-${i}-${j}-3">HTTP Response</a>
-                            % endif
-                            <a href="#tab-anom-${i}-${j}-4">cURL command line</a>
-                            <a href="#tab-anom-${i}-${j}-5">WSTG Code</a>
+                            <a href="#tab-anom-${i}-${j}-3">cURL command line</a>
                         </nav>
                         <section id="tab-anom-${i}-${j}-1" style="min-height: 124px;">
                             <pre>${anomaly["info"] | h}</pre>
                         </section>
                         <section id="tab-anom-${i}-${j}-2" style="min-height: 124px;" class="is-hidden">
-                            <pre style="white-space: normal">
-                                % for line in anomaly["http_request"].split("\n"):
-                                    ${line | h}
-                                    <br>
-                                % endfor
-                            </pre>
+                            <pre>${anomaly["http_request"] | h}</pre>
                         </section>
-                        % if detailed_report is True and anomaly["detail"]["response"] is not None:
-                            <section id="tab-anom-${i}-${j}-3" style="min-height: 124px;" class="is-hidden">
-                                <pre style="white-space: nowrap">
-                                    HTTP ${anomaly["detail"]["response"]["status_code"] | h}<br />
-                                    % if anomaly["detail"]["response"]["headers"] is not None:
-                                        % for header in anomaly["detail"]["response"]["headers"]:
-                                            ${header[0] | h}: ${header[1] | h}<br />
-                                        %endfor
-                                    %endif
-                                    <br />
-                                    ${anomaly["detail"]["response"]["body"] | h}
-                                </pre>
-                            </section>
-                        % endif
-                        <section id="tab-anom-${i}-${j}-4" style="min-height: 124px;" class="is-hidden">
+                        <section id="tab-anom-${i}-${j}-3" style="min-height: 124px;" class="is-hidden">
                             <pre>${anomaly["curl_command"] | h}</pre>
-                        </section>
-                        <section id="tab-anom-${i}-${j}-5" style="min-height: 124px;" class="is-hidden">
-                            <pre>${anomaly["wstg"] | h}</pre>
                         </section>
                     % endfor
 
@@ -212,46 +147,20 @@
                 </dl>
 
                     % for j, additional in enumerate(additionals[additional_name]):
-                        <h4>${level_to_emoji(additional["level"])} Additional found in ${additional["path"] | h}</h4>
+                        <h4>Additional found in ${additional["path"] | h}</h4>
                         <nav class="tabs" data-kube="tabs" data-equal="true" data-height="equal">
                             <a href="#tab-addition-${i}-${j}-1" class="is-active">Description</a>
                             <a href="#tab-addition-${i}-${j}-2">HTTP Request</a>
-                            % if detailed_report is True and additional["detail"]["response"] is not None:
-                                <a href="#tab-addition-${i}-${j}-3">HTTP Response</a>
-                            % endif
-                            <a href="#tab-addition-${i}-${j}-4">cURL command line</a>
-                            <a href="#tab-addition-${i}-${j}-5">WSTG Code</a>
+                            <a href="#tab-addition-${i}-${j}-3">cURL command line</a>
                         </nav>
                         <section id="tab-addition-${i}-${j}-1" style="min-height: 124px;">
                             <pre>${additional["info"] | h}</pre>
                         </section>
                         <section id="tab-addition-${i}-${j}-2" style="min-height: 124px;" class="is-hidden">
-                            <pre style="white-space: normal">
-                                % for line in additional["http_request"].split("\n"):
-                                    ${line | h}
-                                    <br>
-                                % endfor
-                            </pre>
+                            <pre>${additional["http_request"] | h}</pre>
                         </section>
-                        % if detailed_report is True and additional["detail"]["response"] is not None:
-                            <section id="tab-addition-${i}-${j}-3" style="min-height: 124px;" class="is-hidden">
-                                <pre style="white-space: nowrap">
-                                    HTTP ${additional["detail"]["response"]["status_code"] | h}<br />
-                                    % if additional["detail"]["response"]["headers"] is not None:
-                                        % for header in additional["detail"]["response"]["headers"]:
-                                            ${header[0] | h}: ${header[1] | h}<br />
-                                        %endfor
-                                    %endif
-                                    <br />
-                                    ${additional["detail"]["response"]["body"] | h}
-                                </pre>
-                            </section>
-                        % endif
-                        <section id="tab-addition-${i}-${j}-4" style="min-height: 124px;" class="is-hidden">
+                        <section id="tab-addition-${i}-${j}-3" style="min-height: 124px;" class="is-hidden">
                             <pre>${additional["curl_command"] | h}</pre>
-                        </section>
-                        <section id="tab-addition-${i}-${j}-5" style="min-height: 124px;" class="is-hidden">
-                            <pre>${additional["wstg"] | h}</pre>
                         </section>
                     % endfor
                 <dl><dt>Solutions</dt><dd>${flaws[additional_name]["sol"]}</dd></dl>
@@ -266,9 +175,8 @@
                 % endif
             % endfor
         </div>
-        <footer class="small" id="footer"><a href="https://wapiti-scanner.github.io/" id="wapiti_link">${wapiti_version}</a> &copy; Nicolas SURRIBAS 2006-2022</footer>
+        <footer class="small" id="footer"><a href="https://wapiti.sourceforge.io/" id="wapiti_link">${wapiti_version}</a> &copy; Nicolas SURRIBAS 2006-2021</footer>
 	</div>
-    <script type="text/javascript" src="js/kube.min.js"></script>
     <script>$K.init();</script>
 </body>
 </html>

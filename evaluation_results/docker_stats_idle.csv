@@ -1,0 +1,12 @@
+scenario,container,cpu_perc,mem_usage,mem_limit,net_io,block_io,pids
+idle,attacker,0.00%,888KiB / 7.654GiB,0.01%,1.82kB / 126B,0B / 0B,2
+idle,firewall,0.00%,1.461MiB / 7.654GiB,0.02%,4.34kB / 526B,0B / 41kB,2
+idle,victim,0.00%,12.31MiB / 7.654GiB,0.16%,1.99kB / 126B,0B / 8.19kB,8
+idle,iot1,0.00%,880KiB / 7.654GiB,0.01%,2.25kB / 126B,0B / 0B,2
+idle,iot-bulb,0.00%,1.359MiB / 7.654GiB,0.02%,2.25kB / 126B,0B / 0B,5
+idle,attacker-home,0.00%,1.133MiB / 7.654GiB,0.01%,2.17kB / 126B,0B / 0B,1
+idle,iot-thermostat-web,0.01%,18.89MiB / 7.654GiB,0.24%,2.51kB / 126B,0B / 4.1kB,3
+idle,iot-camera,0.01%,19.78MiB / 7.654GiB,0.25%,2.47kB / 126B,0B / 4.1kB,3
+idle,attacker-victim,0.00%,1.141MiB / 7.654GiB,0.01%,2.03kB / 126B,0B / 0B,1
+idle,splunk,107.36%,156.2MiB / 7.654GiB,1.99%,6.26kB / 516B,0B / 655MB,5
+idle,router,0.00%,6.375MiB / 7.654GiB,0.08%,7.67kB / 662B,0B / 0B,2

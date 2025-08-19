@@ -114,6 +114,36 @@ services:
       attacker_net:
         ipv4_address: 10.88.10.10
 
+  attacker-victim:
+    build:
+      context: ./attacker-victim
+    container_name: attacker-victim
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    stdin_open: true
+    tty: true
+    command: /opt/startup.sh
+    networks:
+      victim_net:
+        ipv4_address: 10.88.30.250
+
+  attacker-home:
+    build:
+      context: ./attacker-home
+    container_name: attacker-home
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    stdin_open: true
+    tty: true
+    command: /opt/startup.sh
+    networks:
+      home_net:
+        ipv4_address: 10.88.20.250
+
   splunk:
     image: splunk/splunk:latest
     platform: linux/amd64
