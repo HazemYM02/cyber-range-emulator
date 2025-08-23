@@ -10,7 +10,6 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 - Simulate common attack paths and misconfigurations in controlled networks  
 - Launch security tools like Nmap, Nikto, Wapiti, ZAP, and more  
 - Monitor attacks and logs using centralized Splunk integration  
-- Visualize container roles and connectivity through a custom interactive GUI  
 - Practice red teaming, packet analysis, ARP spoofing, and basic log correlation
 
 ---
@@ -54,11 +53,6 @@ A modular, Docker-based cybersecurity training and testing environment designed 
 - **DVWA** running on victim node at `http://localhost:8000`  
 - **Network segmentation** enforced by Docker bridge networks and firewall rules  
 - **Real-time packet inspection** and log forwarding via `rsyslog` and `iptables`  
-- **Graphical network visualization** with Streamlit + PyVis:
-  - Router: star  
-  - Firewalls: box  
-  - Endpoints/IoT: ellipse  
-  - Splunk: hexagon
 
 ---
 
@@ -81,10 +75,7 @@ docker ps
 # 5. Access the attacker container to run security tools
 docker exec -it attacker bash
 
-# 6. Launch the network visualizer (Streamlit GUI)
-streamlit run network_gui.py
-
-# 7. Access the main services in your browser
+# 6. Access the main services in your browser
 DVWA Victim:  http://localhost:8000  
 IoT Camera:   http://localhost:8081  
 IoT Thermostat: http://localhost:8082  
